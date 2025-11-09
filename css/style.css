@@ -1,4 +1,4 @@
-/* ===== Base / Reset ===== */
+/*Base / Reset*/
 *,
 *::before,
 *::after { box-sizing: border-box; }
@@ -9,16 +9,17 @@ html, body {
   padding: 0;
 }
 
+/*Global variables*/
 :root{
-  --bg: #0A0B2E;          /* тёмно-синий фон шапки */
+  --bg: #0A0B2E; 
   --bg-2:#0E1050;
-  --brand:#2F2A8C;        /* акцент тёмный */
-  --accent:#2B2A86;       /* кнопки / бордеры */
-  --primary:#1A1344;      /* заголовки */
+  --brand:#2F2A8C;
+  --accent:#2B2A86;
+  --primary:#1A1344;
   --white:#fff;
-  --text:#2B2B2B;         /* основной текст */
-  --muted:#717171;        /* вторичный текст */
-  --card:#FFFFFF;         /* фон карточек */
+  --text:#2B2B2B;   
+  --muted:#717171;  
+  --card:#FFFFFF;    
   --shadow: 0 10px 30px rgba(10,11,46,.15);
   --radius: 16px;
   --radius-lg: 20px;
@@ -174,7 +175,7 @@ button{
 .rent-btn:hover{ filter: brightness(1.05); box-shadow: 0 14px 38px rgba(43,42,134,.35); }
 .rent-btn:active{ transform: translateY(1px); }
 
-/* ===== Booking (плашка справа поверх фото) ===== */
+/* Booking */
 .booking{
   position: relative;
   margin-top: clamp(-500px, -24vw, -320px);
@@ -376,7 +377,7 @@ button{
   font-size: 14px;
 }
 
-/* ===== Responsive ===== */
+/*
 @media (max-width: 1100px){
   .cars-grid{ grid-template-columns: repeat(2, 1fr); }
   .advantages-grid{ grid-template-columns: repeat(2, 1fr); }
@@ -390,7 +391,7 @@ button{
   .login-btn{ margin-left: auto; }
 
   .hero-content{ padding: 40px 0 110px; }
-  /*.booking{ margin-top: -180px; }*/
+  .booking{ margin-top: -180px; }
   .booking-container{ justify-content: center; }
   .booking-form{ padding: 18px; }
 
@@ -401,4 +402,144 @@ button{
 
 @media (prefers-reduced-motion: reduce){
   *{ transition: none !important; }
+}
+*/
+
+/* ===== Auth page (login/register) ===== */
+.auth-wrap{
+  min-height: calc(100vh - 72px - 84px); /* экран минус шапка и футер */
+  background: #F6F7FB;
+  display: grid;
+  place-items: center;
+  padding: 48px 16px;
+}
+
+.auth-card{
+  width: min(420px, 100%);
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(6px);
+  border: 1px solid #E3E6EF;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 26px;
+  display: grid;
+  gap: 14px;
+}
+
+.auth-title{
+  margin: 0;
+  color: var(--primary);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+.auth-desc{ color: var(--muted); margin: -4px 0 6px; }
+
+.field{ position: relative; }
+.field input{
+  width: 100%;
+  height: 46px;
+  padding: 0 44px 0 14px;
+  border-radius: 12px;
+  border: 1px solid #E3E6EF;
+  background: #fff;
+  outline: none;
+  font-size: 14px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.field input:focus{
+  border-color: #B8BDF2;
+  box-shadow: 0 0 0 4px rgba(43,42,134,.1);
+}
+.field .icon{
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  opacity: .7;
+  pointer-events: none;
+}
+
+.auth-actions{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+.auth-remember{ 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  font-size: 13px; 
+  color: var(--muted); 
+  cursor: pointer;
+}
+.auth-remember input[type="checkbox"]{
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+.auth-link{ 
+  color: var(--accent); 
+  text-decoration: none; 
+  font-weight: 600; 
+  transition: color .2s ease;
+}
+.auth-link:hover{ 
+  color: var(--brand); 
+}
+
+.auth-submit{
+  height: 48px;
+  border-radius: 12px;
+  background: var(--bg);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: .2px;
+  box-shadow: var(--shadow);
+  border: 0;
+  cursor: pointer;
+  transition: filter .2s ease, box-shadow .2s ease, transform .08s ease;
+  font-size: 15px;
+}
+.auth-submit:hover{ 
+  filter: brightness(1.05); 
+  box-shadow: 0 14px 38px rgba(43,42,134,.35); 
+}
+.auth-submit:active{ 
+  transform: translateY(1px); 
+}
+
+.auth-register{ 
+  text-align: center; 
+  color: var(--muted); 
+  font-size: 14px;
+  margin-top: 4px;
+}
+.auth-register a{ 
+  color: var(--accent); 
+  text-decoration: none; 
+  font-weight: 700; 
+  transition: color .2s ease;
+}
+.auth-register a:hover{ 
+  color: var(--brand); 
+}
+
+.auth-error{
+  background: #FFE8E8;
+  border: 1px solid #FFD1D1;
+  color: #B00020;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+/* доступность для скрытых лейблов */
+.visually-hidden{
+  position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
 }
