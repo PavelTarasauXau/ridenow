@@ -1,7 +1,8 @@
 <?php
+require_once __DIR__ . '/../config/db.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-/* CSRF токен */
+/* CSRF */
 if (empty($_SESSION['csrf'])) {
   $_SESSION['csrf'] = bin2hex(random_bytes(16));
 }
@@ -24,31 +25,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $errors[] = 'Введите корректный email';
   }
-  
-  if (strlen($full_name) < 2) {
+  if (mb_strlen($full_name) < 2) {
     $errors[] = 'Имя должно содержать минимум 2 символа';
   }
-  
-  if (strlen($password) < 6) {
+  if (mb_strlen($password) < 6) {
     $errors[] = 'Пароль должен содержать минимум 6 символов';
   }
-  
   if ($password !== $password_confirm) {
     $errors[] = 'Пароли не совпадают';
   }
 
   if (!$errors) {
-    // Временно: просто показываем сообщение об успехе
-    // Потом заменишь на сохранение в БД
-    $_SESSION['register_success'] = true;
-    $_SESSION['user'] = [
-      'id' => 999,
-      'email' => $email,
-      'full_name' => $full_name,
-      'role' => 'user'
-    ];
-    header('Location: /index.php');
-    exit;
+    // проверяем, что email свободен
+    $exists = (int)$pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?")->execute([$email]) ?: 0;
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    if ((int)$stmt->fetchColumn() > 0) {
+      $errors[] = 'Email уже зарегистрирован';
+    } else {
+      // создаём пользователя
+      $hash = password_hash($password, PASSWORD_DEFAULT);
+      $ins = $pdo->prepare("INSERT INTO users (email, full_name, password_hash, role) VALUES (?, ?, ?, 'user')");
+      $ins->execute([$email, $full_name, $hash]);
+
+      // авторизуем сразу после регистрации
+      $uid = (int)$pdo->lastInsertId();
+      $_SESSION['user'] = [
+        'id'        => $uid,
+        'email'     => $email,
+        'full_name' => $full_name,
+        'role'      => 'user',
+      ];
+
+      header('Location: /index.php');
+      exit;
+    }
   }
 }
 ?>
@@ -58,9 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RideNow — регистрация</title>
-  <link rel="stylesheet"
-      href="/css/style.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'].'/css/style.css') ?>">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'].'/css/style.css') ?>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <header class="header">
