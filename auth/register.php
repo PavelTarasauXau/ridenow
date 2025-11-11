@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="logo"><a href="/">RideNow</a></div>
       <nav class="nav">
         <a href="/" class="navlink">Главная</a>
-        <a href="/scripts/fleet.php" class="navlink">Автопарк</a>
+        <a href="/fleet.php" class="navlink">Автопарк</a>
         <a href="/auth/login.php" class="navlink">Войти</a>
       </nav>
     </div>

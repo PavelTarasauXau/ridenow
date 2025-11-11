@@ -117,6 +117,51 @@ button{
   border-color: #fff;
 }
 
+/* выравниваем flatpickr под стиль формы */
+.booking-form .date-input,
+.booking-form .flatpickr-input {
+  height: 46px;
+  width: 100%;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #E3E6EF;
+  background: #fff;
+  outline: none;
+  font-size: 14px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+/* flatpickr делает input readonly — вернём обычный курсор и фон */
+.flatpickr-input[readonly] {
+  background: #fff;
+  cursor: text;
+}
+
+/* hover/focus такие же, как у других полей */
+.booking-form .flatpickr-input:focus {
+  border-color: #B8BDF2;
+  box-shadow: 0 0 0 4px rgba(43,42,134,.1);
+}
+
+/* календарь — скругления и тень под карточки */
+.flatpickr-calendar {
+  border: 1px solid #E3E6EF;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(10,11,46,.15);
+  overflow: hidden;
+}
+
+/* активные элементы ближе к твоему акценту */
+.flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange,
+.flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover {
+  background: #2B2A86;
+  border-color: #2B2A86;
+}
+
+/* placeholder мягче */
+.booking-form input::placeholder { color: #9aa0b4; }
+
+
 /* ===== Hero ===== */
 .hero{
   position: relative;
