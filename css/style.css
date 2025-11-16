@@ -422,7 +422,7 @@ button{
   font-size: 14px;
 }
 
-/*
+
 @media (max-width: 1100px){
   .cars-grid{ grid-template-columns: repeat(2, 1fr); }
   .advantages-grid{ grid-template-columns: repeat(2, 1fr); }
@@ -448,7 +448,6 @@ button{
 @media (prefers-reduced-motion: reduce){
   *{ transition: none !important; }
 }
-*/
 
 /* ===== Auth page (login/register) ===== */
 .auth-wrap{

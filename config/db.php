@@ -1,12 +1,12 @@
 <?php
-// ====== НАСТРОЙКИ ======
-$DB_HOST = '127.127.126.31';   // не трогаем
-$DB_PORT = 3306;               // не трогаем
+
+$DB_HOST = '127.127.126.31';   
+$DB_PORT = 3306;               
 $DB_NAME = 'ridenow';
 $DB_USER = 'root';
 $DB_PASS = '';
 
-// Подключение к существующей БД
+// Подключение к БД
 try {
     $pdo = new PDO(
         "mysql:host=$DB_HOST;port=$DB_PORT;dbname=$DB_NAME;charset=utf8mb4",
