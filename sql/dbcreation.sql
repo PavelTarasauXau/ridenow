@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB;
 
-        CREATE TABLE IF NOT EXISTS cars (
+CREATE TABLE IF NOT EXISTS cars (
             id INT AUTO_INCREMENT PRIMARY KEY,
             make VARCHAR(100) NOT NULL,
             model VARCHAR(100) NOT NULL,
@@ -19,3 +19,16 @@ CREATE TABLE IF NOT EXISTS users (
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             INDEX (make, model, transmission, fuel, seats, daily_price)
         ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS bookings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NULL,
+        car_id  INT NOT NULL,
+        place   VARCHAR(255) NOT NULL,
+        start_at DATETIME NOT NULL,
+        end_at   DATETIME NOT NULL,
+        status   ENUM('pending','approved','cancelled') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_car_time (car_id, start_at, end_at),
+        CONSTRAINT fk_book_car FOREIGN KEY (car_id) REFERENCES cars(id) ON DELETE CASCADE
+);

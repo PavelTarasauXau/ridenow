@@ -34,7 +34,11 @@ body{
 }
 
 img{ max-width: 100%; display: block; }
-a{ color: inherit; }
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 
 /* ===== Utils ===== */
 .container{
@@ -351,12 +355,103 @@ button{
   margin: 10px 0 14px;
 }
 
-.car-card .rent-btn{
-  margin: 0 16px;
+.car-card .rent-btn {
+  display: flex;
+  justify-content: center; /* центр по горизонтали */
+  align-items: center;     /* центр по вертикали */
+  width: auto;             /* пусть ширина остаётся исходной */
+  margin: 0 16px;          /* как у тебя было */
   height: 44px;
   padding: 0 18px;
-  width: auto;
+  text-align: center;
 }
+
+
+/* ===== Fleet Booking section ===== */
+.fleet-booking {
+  background: #f6f7fb;
+  padding: 60px 0;
+}
+
+.fb-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  width: min(var(--container), 100% - 48px);
+  margin-inline: auto;
+  flex-wrap: wrap;
+}
+
+.fb-photo {
+  flex: 1 1 50%;
+  max-width: 600px;
+}
+
+.fb-photo img {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  object-fit: cover;
+}
+
+/*Тут менял все*/
+/* форма справа */
+/* ===== Fleet Booking section ===== */
+.fleet-booking {
+  background: #f6f7fb;
+  padding: 60px 0;
+}
+
+.fb-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  width: min(var(--container), 100% - 48px);
+  margin-inline: auto;
+  flex-wrap: wrap;
+}
+
+.fb-photo {
+  flex: 1 1 50%;
+  max-width: 600px;
+}
+
+.fb-photo img {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  object-fit: cover;
+}
+
+/* форма справа ТОЛЬКО внутри .fleet-booking */
+.fleet-booking .booking-form {
+  flex: 1 1 420px;
+  max-width: 520px;
+  background: rgba(255,255,255,.96);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 30px;
+  border: 1px solid #E3E6EF;
+  display: grid;
+  gap: 16px;
+}
+
+
+/* адаптив */
+@media (max-width: 900px) {
+  .fb-grid {
+    flex-direction: column;
+    gap: 32px;
+  }
+  .fb-photo, .booking-form {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}
+
+
 
 /* ===== How it works ===== */
 .how-it-works{ padding: 64px 0; background: linear-gradient(180deg,#fff 0,#F6F7FB 100%); }

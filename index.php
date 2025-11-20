@@ -24,7 +24,7 @@ $user = $_SESSION['user'] ?? null; // ожидание: ['id'=>..., 'full_name'=
         <nav class="nav">
             <a href="/" class="navlink">Главная</a>
             <a href="#how" class="navlink">Как это работает</a>
-            <a href="/fleet.php" class="navlink">Автопарк</a>
+            <a href="/pages/fleet.php" class="navlink">Автопарк</a>
             <a href="#pricing" class="navlink">Тарифы</a>
             <a href="#contacts" class="navlink">Контакты</a>
 
@@ -46,11 +46,10 @@ $user = $_SESSION['user'] ?? null; // ожидание: ['id'=>..., 'full_name'=
         </div>
         <div class="hero-content">
             <h1>Аренда автомобиля в пару кликов</h1>
-            <a class="rent-btn" href="/fleet.php">Арендовать авто</a>
+            <a class="rent-btn" href="/pages/fleet.php">Арендовать авто</a>
         </div>
     </section>
 
-    <!-- Форма пока без БД: отправляем параметры на страницу автопарка (GET) -->
     <section class="booking">
   <div class="booking-container">
     <form class="booking-form" action="/fleet.php" method="get" autocomplete="off">
@@ -106,7 +105,7 @@ $user = $_SESSION['user'] ?? null; // ожидание: ['id'=>..., 'full_name'=
                     <span>5 мест</span>
                 </div>
                 <p class="car-price">59 р/сутки</p>
-                <a class="rent-btn" href="/fleet.php?q=Kia%20Rio">Забронировать</a>
+                <a class="rent-btn" href="/pages/fleet.php?q=Kia%20Rio">Забронировать</a>
             </div>
 
             <div class="car-card">
@@ -118,7 +117,7 @@ $user = $_SESSION['user'] ?? null; // ожидание: ['id'=>..., 'full_name'=
                     <span>5 мест</span>
                 </div>
                 <p class="car-price">89 р/сутки</p>
-                <a class="rent-btn" href="/fleet.php?q=Geely%20Coolray">Забронировать</a>
+                <a class="rent-btn" href="/pages/fleet.php?q=Geely%20Coolray">Забронировать</a>
             </div>
 
             <div class="car-card">
@@ -130,7 +129,7 @@ $user = $_SESSION['user'] ?? null; // ожидание: ['id'=>..., 'full_name'=
                     <span>5 мест</span>
                 </div>
                 <p class="car-price">99 р/сутки</p>
-                <a class="rent-btn" href="/fleet.php?q=Renault%20Scenic">Забронировать</a>
+                <a class="rent-btn" href="/pages/fleet.php?q=Renault%20Scenic">Забронировать</a>
             </div>
         </div>
     </section>

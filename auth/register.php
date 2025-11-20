@@ -37,11 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if (!$errors) {
     // проверяем, что email свободен
-    $exists = (int)$pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?")->execute([$email]) ?: 0;
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
     $stmt->execute([$email]);
     if ((int)$stmt->fetchColumn() > 0) {
-      $errors[] = 'Email уже зарегистрирован';
+        $errors[] = 'Email уже зарегистрирован';
     } else {
       // создаём пользователя
       $hash = password_hash($password, PASSWORD_DEFAULT);
@@ -78,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="logo"><a href="/">RideNow</a></div>
       <nav class="nav">
         <a href="/" class="navlink">Главная</a>
-        <a href="/fleet.php" class="navlink">Автопарк</a>
+        <a href="/pages/fleet.php" class="navlink">Автопарк</a>
         <a href="/auth/login.php" class="navlink">Войти</a>
       </nav>
     </div>
