@@ -1,7 +1,51 @@
 <?php
 require __DIR__ . '/../config/db.php';
 require __DIR__ . '/../includes/guard.php';
+
+// Читаем параметры из GET
+$q    = trim($_GET['q'] ?? '');
+$sort = $_GET['sort'] ?? '';
+
+// Базовый SQL
+$sql = "SELECT id, make, model, transmission, fuel, seats, daily_price, image_url
+        FROM cars
+        WHERE 1";
+$params = [];
+
+// Если есть строка поиска — фильтруем по марке или модели
+if ($q !== '') {
+  $sql .= " AND (
+      make LIKE :q1
+      OR model LIKE :q2
+      OR CONCAT(make, ' ', model) LIKE :q3
+  )";
+
+  $like = '%'.$q.'%';
+  $params[':q1'] = $like;
+  $params[':q2'] = $like;
+  $params[':q3'] = $like;
+}
+
+
+
+// Сортировка по цене
+if ($sort === 'price_asc') {
+    $sql .= " ORDER BY daily_price ASC";
+} elseif ($sort === 'price_desc') {
+    $sql .= " ORDER BY daily_price DESC";
+} else {
+    // сортировка по умолчанию (как было раньше)
+    $sql .= " ORDER BY id DESC";
+}
+
+// можно ограничить, чтобы не выводить тонну
+$sql .= " LIMIT 100";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$cars = $stmt->fetchAll();
 ?>
+
 <!doctype html>
 <html lang="ru">
 <head>
@@ -64,10 +108,55 @@ require __DIR__ . '/../includes/guard.php';
   });
 </script>-->
 
+<!--added-->
 <section class="fleet section">
   <h2>Наш автопарк</h2>
   <p class="fleet-subtitle">Популярные автомобили</p>
 
+  <!-- ФИЛЬТРЫ -->
+  <form class="fleet-filters" method="get">
+    <input
+      type="text"
+      name="q"
+      placeholder="Поиск по марке или модели..."
+      value="<?= htmlspecialchars($q) ?>"
+    >
+
+    <select name="sort">
+      <option value="">Сортировка по цене</option>
+      <option value="price_asc"  <?= $sort === 'price_asc'  ? 'selected' : '' ?>>Сначала дешёвые</option>
+      <option value="price_desc" <?= $sort === 'price_desc' ? 'selected' : '' ?>>Сначала дорогие</option>
+    </select>
+
+    <button type="submit" class="findauto-btn">Применить</button>
+    <button type="button" class="viewall-btn" onclick="window.location='/pages/fleet.php'">Показать все</button>
+
+  </form>
+
+  <div class="cars-grid">
+    <?php foreach ($cars as $c): 
+      $img = $c['image_url'] ?: '/pics/kia_rio_4.jpg';
+    ?>
+      <div class="car-card">
+        <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($c['make'].' '.$c['model']) ?>">
+        <h3><?= htmlspecialchars($c['make'].' '.$c['model']) ?></h3>
+        <div class="car-details">
+          <span><?= htmlspecialchars($c['transmission']) ?></span>
+          <span><?= htmlspecialchars($c['fuel']) ?></span>
+          <span><?= (int)$c['seats'] ?> мест</span>
+        </div>
+        <p class="car-price"><?= htmlspecialchars($c['daily_price']) ?> р/сутки</p>
+        <button class="rent-btn bf-select"
+                data-car="<?= (int)$c['id'] ?>"
+                data-price="<?= htmlspecialchars($c['daily_price']) ?>">
+          Забронировать
+        </button>
+      </div>
+    <?php endforeach; ?>
+  </div>
+</section>
+
+<!-- Это наверно надо будет убрать
   <div class="cars-grid">
     <?php
     // простая витрина из таблицы cars
@@ -94,7 +183,7 @@ require __DIR__ . '/../includes/guard.php';
     <?php endforeach; ?>
   </div>
 </section>
-
+    -->
 <?php require __DIR__ . '/../includes/footer.php'; ?>
 <script type="module">
   import { initBooking } from '/js/booking.js';

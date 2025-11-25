@@ -451,7 +451,48 @@ button{
   }
 }
 
+/*new(for user requests)*/
+.fleet-filters {
+  width: min(var(--container), 100% - 48px);
+  margin: 0 auto 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
 
+.fleet-filters input[type="text"],
+.fleet-filters select {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #E3E6EF;
+  font-size: 14px;
+}
+
+.fleet-filters input[type="text"] {
+  flex: 1 1 220px;
+}
+
+.fleet-filters select {
+  flex: 0 0 200px;
+}
+
+.fleet-filters .findauto-btn {
+  margin-top: 0px;
+  height: 40px;
+  padding: 0 16px;
+
+}
+
+.fleet-filters .viewall-btn {
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid black;
+  border-radius: 12px;
+}
+
+/**/
 
 /* ===== How it works ===== */
 .how-it-works{ padding: 64px 0; background: linear-gradient(180deg,#fff 0,#F6F7FB 100%); }
