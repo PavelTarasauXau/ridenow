@@ -5,6 +5,7 @@ $cars = [
   ['Kia',   'Rio',        'механика', 'бензин', 5, 59.00, '/pics/kia_rio_4.jpg'],
   ['Geely', 'Coolray',    'автомат',  'бензин', 5, 89.00, '/pics/novyy_geely_coolray_2_c0b.webp'],
   ['Renault','Scenic',    'механика', 'дизель', 5, 99.00, '/pics/renaultscenic.jpeg'],
+  ['Renault','Megane',    'механика', 'дизель', 5, 69.00, '/pics/renaultmegane.jpg'],
 ];
 
 $stmt = $pdo->prepare("
