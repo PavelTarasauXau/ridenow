@@ -18,26 +18,7 @@ $user = $_SESSION['user'] ?? null; // ожидание: ['id'=>..., 'full_name'=
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
-<header class="header">
-    <div class="header-container">
-        <div class="logo"><a href="/">RideNow</a></div>
-        <nav class="nav">
-            <a href="/" class="navlink">Главная</a>
-            <a href="#how" class="navlink">Как это работает</a>
-            <a href="/pages/fleet.php" class="navlink">Автопарк</a>
-            <a href="#pricing" class="navlink">Тарифы</a>
-            <a href="#contacts" class="navlink">Контакты</a>
-
-            <?php if ($user): ?>
-                <span class="navlink" style="opacity:.9;">Привет, <?= htmlspecialchars($user['full_name'] ?? 'пользователь') ?></span>
-                <a class="navlink" href="/auth/logout.php">Выйти</a>
-            <?php else: ?>
-                <a class="navlink" href="/auth/register.php">Регистрация</a>
-                <a class="login-btn" href="/auth/login.php">Войти</a>
-            <?php endif; ?>
-        </nav>
-    </div>
-</header>
+<?php require __DIR__ . '/includes/header.php'; ?>
 
 <main class="main">
     <section class="hero">

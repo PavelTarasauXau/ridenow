@@ -1,36 +1,43 @@
-// /js/booking.js
 export function initBooking() {
-  const form   = document.getElementById('bookingForm');
+  const form = document.getElementById('bookingForm');
   const carIdInput = document.getElementById('bf_car_id');
   const hintEl = document.getElementById('bf_hint');
-  const msgEl  = document.getElementById('bf_msg');
+  const msgEl = document.getElementById('bf_msg');
   const selects = document.querySelectorAll('.bf-select');
 
   if (!form || !carIdInput) return;
 
-  // выбор машины из карточки
-  selects.forEach(btn => {
+  const setMsg = (text, ok = false) => {
+    msgEl.textContent = text || '';
+    msgEl.style.color = ok ? 'green' : 'darkred';
+  };
+
+  const setHint = (text) => {
+    hintEl.textContent = text || '';
+  };
+
+  // Выбор авто из карточки
+  selects.forEach((btn) => {
     btn.addEventListener('click', () => {
-      const id    = btn.dataset.car;
+      const id = btn.dataset.car;
       const price = btn.dataset.price;
 
       carIdInput.value = id;
-      hintEl.textContent = `Вы выбрали авто #${id}, цена ${price} р/сутки`;
-      msgEl.textContent = '';
+      setHint(`Вы выбрали авто #${id}, цена ${price} р/сутки`);
+      setMsg('');
 
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
 
-  // отправка формы бронирования через fetch
+  // Отправка формы
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    msgEl.textContent = '';
-    hintEl.textContent = '';
+    setMsg('');
+    // hint не очищаем — пусть показывает выбранную машину
 
     if (!carIdInput.value) {
-      msgEl.textContent = 'Сначала выберите автомобиль ниже.';
-      msgEl.style.color = 'darkred';
+      setMsg('Сначала выберите автомобиль ниже.');
       return;
     }
 
@@ -39,20 +46,38 @@ export function initBooking() {
     try {
       const resp = await fetch('/api/book.php', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
-      const data = await resp.json();
+      // если сервер вернул НЕ json — тоже поймаем
+      const data = await resp.json().catch(() => null);
+
+      if (!data) {
+        setMsg('Сервер вернул некорректный ответ');
+        return;
+      }
+
+      // 401 — не авторизован
+      if (resp.status === 401) {
+        setMsg(data.error || 'Требуется авторизация');
+        // можно редиректить:
+        // window.location.href = '/auth/login.php';
+        return;
+      }
+
+      // 419 — CSRF
+      if (resp.status === 419) {
+        setMsg(data.error || 'Сессия истекла, обновите страницу');
+        return;
+      }
+
       if (data.ok) {
-        msgEl.textContent = `Бронирование создано, номер: ${data.booking_id}`;
-        msgEl.style.color = 'green';
+        setMsg(`Бронирование создано, номер: ${data.booking_id}`, true);
       } else {
-        msgEl.textContent = data.error || 'Ошибка бронирования';
-        msgEl.style.color = 'darkred';
+        setMsg(data.error || 'Ошибка бронирования');
       }
     } catch (err) {
-      msgEl.textContent = 'Сервер недоступен, попробуйте позже';
-      msgEl.style.color = 'darkred';
+      setMsg('Сервер недоступен, попробуйте позже');
     }
   });
 }

@@ -2,10 +2,13 @@
 <header class="header">
   <div class="header-container">
     <div class="logo"><a href="/">RideNow</a></div>
+
     <nav class="nav">
       <a href="/" class="navlink">Главная</a>
       <a href="/pages/fleet.php" class="navlink">Автопарк</a>
+
       <?php if (!empty($_SESSION['user'])): ?>
+        <a href="/pages/contracts.php" class="navlink">Контракты</a>
         <a href="/auth/logout.php" class="navlink">
           Выйти (<?= htmlspecialchars($_SESSION['user']['full_name'] ?? 'user') ?>)
         </a>
