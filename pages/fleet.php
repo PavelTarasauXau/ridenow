@@ -1,18 +1,17 @@
 <?php
 require __DIR__ . '/../config/db.php';
 require __DIR__ . '/../includes/guard.php';
-
-// Читаем параметры из GET
+ 
 $q    = trim($_GET['q'] ?? '');
 $sort = $_GET['sort'] ?? '';
 
-// Базовый SQL
+
 $sql = "SELECT id, make, model, transmission, fuel, seats, daily_price, image_url
         FROM cars
         WHERE 1";
 $params = [];
 
-// Если есть строка поиска — фильтруем по марке или модели
+
 if ($q !== '') {
   $sql .= " AND (
       make LIKE :q1
@@ -26,19 +25,16 @@ if ($q !== '') {
   $params[':q3'] = $like;
 }
 
-
-
-// Сортировка по цене
+//сортировка
 if ($sort === 'price_asc') {
     $sql .= " ORDER BY daily_price ASC";
 } elseif ($sort === 'price_desc') {
     $sql .= " ORDER BY daily_price DESC";
 } else {
-    // сортировка по умолчанию (как было раньше)
     $sql .= " ORDER BY id DESC";
 }
 
-// можно ограничить, чтобы не выводить тонну
+//ограничение, чтоб не выводить все
 $sql .= " LIMIT 100";
 
 $stmt = $pdo->prepare($sql);
@@ -113,7 +109,7 @@ $cars = $stmt->fetchAll();
   <h2>Наш автопарк</h2>
   <p class="fleet-subtitle">Популярные автомобили</p>
 
-  <!-- ФИЛЬТРЫ -->
+  <!-- форма для поиска -->
   <form class="fleet-filters" method="get">
     <input
       type="text"
