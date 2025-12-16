@@ -1,47 +1,87 @@
 <?php
 require __DIR__ . '/../config/db.php';
 require __DIR__ . '/../includes/guard.php';
- 
+
+// -------- GET параметры --------
 $q    = trim($_GET['q'] ?? '');
 $sort = $_GET['sort'] ?? '';
 
+$place = trim($_GET['place'] ?? '');
+$start = trim($_GET['start'] ?? '');
+$end   = trim($_GET['end'] ?? '');
 
+// index.php отдаёт d.m.Y H:i, а fleet форма отдаёт datetime-local (Y-m-d\TH:i)
+function parse_dt(string $s): ?DateTime {
+  $s = trim($s);
+  if ($s === '') return null;
+
+  // 1) d.m.Y H:i (с index.php)
+  $dt = DateTime::createFromFormat('d.m.Y H:i', $s);
+  if ($dt instanceof DateTime) return $dt;
+
+  // 2) datetime-local: 2025-12-20T20:00
+  $dt = DateTime::createFromFormat('Y-m-d\TH:i', $s);
+  if ($dt instanceof DateTime) return $dt;
+
+  // 3) fallback
+  $dt = date_create($s);
+  return ($dt instanceof DateTime) ? $dt : null;
+}
+
+$start_dt = parse_dt($start);
+$end_dt   = parse_dt($end);
+$hasRange = ($start_dt && $end_dt && $start_dt < $end_dt);
+
+// -------- SQL --------
 $sql = "SELECT id, make, model, transmission, fuel, seats, daily_price, image_url
         FROM cars
         WHERE 1";
 $params = [];
 
-
+// поиск
 if ($q !== '') {
   $sql .= " AND (
       make LIKE :q1
       OR model LIKE :q2
       OR CONCAT(make, ' ', model) LIKE :q3
   )";
-
   $like = '%'.$q.'%';
   $params[':q1'] = $like;
   $params[':q2'] = $like;
   $params[':q3'] = $like;
 }
 
-//сортировка
-if ($sort === 'price_asc') {
-    $sql .= " ORDER BY daily_price ASC";
-} elseif ($sort === 'price_desc') {
-    $sql .= " ORDER BY daily_price DESC";
-} else {
-    $sql .= " ORDER BY id DESC";
+// только свободные на интервал
+if ($hasRange) {
+  $sql .= " AND NOT EXISTS (
+      SELECT 1 FROM bookings b
+      WHERE b.car_id = cars.id
+        AND b.status IN ('pending','approved')
+        AND NOT (b.end_at <= :s OR b.start_at >= :e)
+  )";
+  $params[':s'] = $start_dt->format('Y-m-d H:i:s');
+  $params[':e'] = $end_dt->format('Y-m-d H:i:s');
 }
 
-//ограничение, чтоб не выводить все
+// сортировка
+if ($sort === 'price_asc') {
+  $sql .= " ORDER BY daily_price ASC";
+} elseif ($sort === 'price_desc') {
+  $sql .= " ORDER BY daily_price DESC";
+} else {
+  $sql .= " ORDER BY id DESC";
+}
+
 $sql .= " LIMIT 100";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $cars = $stmt->fetchAll();
-?>
 
+// значения для заполнения datetime-local
+$start_local = $hasRange ? $start_dt->format('Y-m-d\TH:i') : '';
+$end_local   = $hasRange ? $end_dt->format('Y-m-d\TH:i')   : '';
+?>
 <!doctype html>
 <html lang="ru">
 <head>
@@ -68,15 +108,20 @@ $cars = $stmt->fetchAll();
 
       <div class="form-group">
         <label>Откуда</label>
-        <input type="text" name="place" placeholder="Введите место" required>
+        <input type="text" name="place" placeholder="Введите место" required
+               value="<?= htmlspecialchars($place) ?>">
       </div>
+
       <div class="form-group">
         <label>Дата и время начала</label>
-        <input type="datetime-local" name="start" required>
+        <input type="datetime-local" name="start" required
+               value="<?= htmlspecialchars($start_local) ?>">
       </div>
+
       <div class="form-group">
         <label>Дата и время окончания</label>
-        <input type="datetime-local" name="end" required>
+        <input type="datetime-local" name="end" required
+               value="<?= htmlspecialchars($end_local) ?>">
       </div>
 
       <button type="submit" id="bf_submit" class="findauto-btn">Забронировать</button>
@@ -86,31 +131,18 @@ $cars = $stmt->fetchAll();
   </div>
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-<!--<script>
-  const startPicker = flatpickr("#start", {
-    enableTime: true,
-    dateFormat: "d.m.Y H:i",
-    minDate: "today",
-    time_24hr: true,
-    onChange: ([date]) => endPicker.set('minDate', date || "today")
-  });
-  const endPicker = flatpickr("#end", {
-    enableTime: true,
-    dateFormat: "d.m.Y H:i",
-    minDate: "today",
-    time_24hr: true
-  });
-</script>-->
-
-<!--added-->
 <section class="fleet section">
   <h2>Наш автопарк</h2>
-  <p class="fleet-subtitle">Популярные автомобили</p>
+  <p class="fleet-subtitle">
+    <?= $hasRange ? 'Доступные автомобили на выбранное время' : 'Популярные автомобили' ?>
+  </p>
 
-  <!-- форма для поиска -->
+  <!-- фильтры: сохраняем place/start/end, чтобы при сортировке не потерялись даты -->
   <form class="fleet-filters" method="get">
+    <input type="hidden" name="place" value="<?= htmlspecialchars($place) ?>">
+    <input type="hidden" name="start" value="<?= htmlspecialchars($start) ?>">
+    <input type="hidden" name="end"   value="<?= htmlspecialchars($end) ?>">
+
     <input
       type="text"
       name="q"
@@ -126,8 +158,16 @@ $cars = $stmt->fetchAll();
 
     <button type="submit" class="findauto-btn">Применить</button>
     <button type="button" class="viewall-btn" onclick="window.location='/pages/fleet.php'">Показать все</button>
-
   </form>
+
+  <?php if ($hasRange && empty($cars)): ?>
+    <div class="container">
+      <div class="contracts-empty">
+        <div class="contracts-empty-title">Нет доступных автомобилей</div>
+        <div class="contracts-empty-text">Попробуйте выбрать другой интервал или снять фильтры.</div>
+      </div>
+    </div>
+  <?php endif; ?>
 
   <div class="cars-grid">
     <?php foreach ($cars as $c): 
@@ -152,34 +192,6 @@ $cars = $stmt->fetchAll();
   </div>
 </section>
 
-<!-- Это наверно надо будет убрать
-  <div class="cars-grid">
-    <?php
-    // простая витрина из таблицы cars
-    $cars = $pdo->query("SELECT id, make, model, transmission, fuel, seats, daily_price, image_url
-                         FROM cars ORDER BY id DESC LIMIT 12")->fetchAll();
-    foreach ($cars as $c):
-      $img = $c['image_url'] ?: '/pics/kia_rio_4.jpg';
-    ?>
-    <div class="car-card">
-      <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($c['make'].' '.$c['model']) ?>">
-      <h3><?= htmlspecialchars($c['make'].' '.$c['model']) ?></h3>
-      <div class="car-details">
-        <span><?= htmlspecialchars($c['transmission']) ?></span>
-        <span><?= htmlspecialchars($c['fuel']) ?></span>
-        <span><?= (int)$c['seats'] ?> мест</span>
-      </div>
-      <p class="car-price"><?= htmlspecialchars($c['daily_price']) ?> р/сутки</p>
-      <button class="rent-btn bf-select"
-              data-car="<?= (int)$c['id'] ?>"
-              data-price="<?= htmlspecialchars($c['daily_price']) ?>">
-        Забронировать
-      </button>
-    </div>
-    <?php endforeach; ?>
-  </div>
-</section>
-    -->
 <?php require __DIR__ . '/../includes/footer.php'; ?>
 <script type="module">
   import { initBooking } from '/js/booking.js';

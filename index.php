@@ -33,7 +33,7 @@ $user = $_SESSION['user'] ?? null; // ожидание: ['id'=>..., 'full_name'=
 
     <section class="booking">
   <div class="booking-container">
-    <form class="booking-form" action="/fleet.php" method="get" autocomplete="off">
+    <form class="booking-form" action="/pages/fleet.php" method="get" autocomplete="off">
       <legend><p class="booking-slogan">Выбери, забронируй, поезжай<br>Без очереди и бумаг</p></legend>
 
       <div class="form-group">

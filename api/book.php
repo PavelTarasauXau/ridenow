@@ -16,10 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') bad('Method not allowed', 405);
 require_csrf_json($_POST['csrf'] ?? null);
 require_auth_json();
 
+// данные
 $car_id = (int)($_POST['car_id'] ?? 0);
 $place  = trim((string)($_POST['place'] ?? ''));
-$start  = (string)($_POST['start'] ?? '');
-$end    = (string)($_POST['end'] ?? '');
+$start  = trim((string)($_POST['start'] ?? ''));
+$end    = trim((string)($_POST['end'] ?? ''));
 
 if ($car_id <= 0) bad('Не выбрано авто');
 if ($place === '') bad('Укажите место');
@@ -38,7 +39,7 @@ try {
   $s->execute([$car_id]);
   if (!$s->fetchColumn()) bad('Автомобиль не найден', 404);
 
-  // занятость
+  // занятость (пересечение интервалов)
   $s = $pdo->prepare("
     SELECT COUNT(*) FROM bookings
     WHERE car_id = :c
@@ -53,7 +54,8 @@ try {
 
   if ((int)$s->fetchColumn() > 0) bad('На выбранные даты авто занято');
 
-  $userId = (int)$_SESSION['user']['id'];
+  $userId = (int)($_SESSION['user']['id'] ?? 0);
+  if ($userId <= 0) bad('Требуется авторизация', 401);
 
   $ins = $pdo->prepare("
     INSERT INTO bookings (user_id, car_id, place, start_at, end_at, status)
@@ -69,5 +71,5 @@ try {
 
   echo json_encode(['ok' => true, 'booking_id' => (int)$pdo->lastInsertId()], JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
-  bad('Ошибка сервера: '.$e->getMessage(), 500);
+  bad('Ошибка сервера: ' . $e->getMessage(), 500);
 }
